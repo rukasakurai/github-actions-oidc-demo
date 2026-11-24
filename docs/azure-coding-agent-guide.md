@@ -29,7 +29,7 @@ For the core setup steps, see the official documentation. This guide covers:
 
 > **Note**: This value-proposition framing is not currently in the official docs. The [Azure SDK blog post](https://devblogs.microsoft.com/azure-sdk/azure-developer-cli-copilot-coding-agent-config/) provides some context.
 
-CI/CD workflows (such as this repository's [Azure OIDC connectivity check](../.github/workflows/azure-oidc-check.yml)) can automate `azd provision` on PRs, giving post-hoc validation of infrastructure changes. However, that approach validates changes **after the fact** — the agent authors a change, CI runs, and failures surface only then.
+In projects that deploy infrastructure, CI/CD workflows can run `azd provision` to validate changes **after the fact**. This repository's [Azure OIDC connectivity check](../.github/workflows/azure-oidc-check.yml) verifies authentication and account context only; it does not provision infrastructure or run on PRs.
 
 The coding agent extension complements CI-based validation by giving the agent **read-time visibility into Azure state while it is authoring changes**:
 
@@ -165,7 +165,7 @@ For reproducibility and supply-chain hygiene, consider pinning to a specific ver
 - **Manual steps still required**: The extension automates Azure-side and GitHub environment setup, but you must still manually merge the generated PR, paste the MCP config into repository settings, and optionally adjust roles beyond Reader
 - **Agent behavior is not guaranteed**: Whether the agent consistently uses MCP tools correctly or produces better outcomes depends on the task complexity and model behavior — results may vary
 - **Azure-specific**: This setup provides little to no benefit for repositories that do not interact with Azure resources
-- **Complements, does not replace, CI validation**: This gives the agent read-time Azure visibility; you should still run `azd provision`/`azd up` in CI (e.g., via the [OIDC check workflow](../.github/workflows/azure-oidc-check.yml)) for authoritative deployment validation
+- **Complements, does not replace, CI validation**: For projects that deploy infrastructure, use project-specific `azd provision`/`azd up` validation in addition to agent read-time visibility. The [OIDC check workflow](../.github/workflows/azure-oidc-check.yml) verifies authentication and account context, not deployment.
 
 ## Additional Resources
 

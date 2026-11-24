@@ -1,88 +1,57 @@
-# repo-baseline
+# GitHub Actions OIDC Demo
 
-A minimal GitHub template repository providing baseline structure and conventions for new projects.
+A minimal demonstration of GitHub Actions authenticating to Azure without storing long-lived credentials.
 
-## What This Is
+## How it works
 
-This is a **template repository** that provides:
-- Contribution guidelines ([CONTRIBUTING.md](CONTRIBUTING.md)) and AI collaboration guidance ([AGENTS.md](AGENTS.md))
-- Issue and pull request templates for structured communication
-- Manual Azure OIDC validation workflow
-- E2E test and azd environment management workflows
-- A starting point that avoids premature technical decisions
+1. GitHub Actions issues a short-lived OpenID Connect (OIDC) token to the job. The workflow needs `id-token: write` to request it.
+2. `azure/login@v2` presents that token to Microsoft Entra ID, which checks the configured federated trust for the repository and branch.
+3. Azure issues a short-lived access token for the identity. The workflow then uses the authenticated Azure CLI account.
 
-This template is intentionally minimal and public-safe, containing no secrets, licenses, or environment-specific configuration.
+No client secret, password, or long-lived access token is stored. Azure permissions are assigned separately through RBAC; `id-token: write` does not itself grant Azure access.
 
-## How to Use as a Template
+## Run the demo
 
-1. Click the **"Use this template"** button on GitHub
-2. Create a new repository from this template (public or private)
-3. Follow the post-creation checklist below
+Follow [the Azure OIDC setup guide](docs/azure-oidc-setup.md) to create an identity, configure federated trust for your repository's `main` branch, and grant Reader access at the narrowest appropriate scope.
 
-## Post-Creation Checklist
+Configure these values under **Settings → Secrets and variables → Actions**:
 
-After creating a repository from this template, the [`repo-setup` Agent Skill](.github/skills/repo-setup/SKILL.md) can walk an AI agent through these steps:
+| Name | Stored as |
+|------|-----------|
+| `AZURE_CLIENT_ID` | Repository variable |
+| `AZURE_TENANT_ID` | Repository secret |
+| `AZURE_SUBSCRIPTION_ID` | Repository secret |
 
-- [ ] **Choose and add a LICENSE file** - This template intentionally omits a license; add one appropriate for your project
-- [ ] **Configure Azure OIDC** (if using Azure) - Set up federated credentials and add the following repository secrets:
+These are **identifiers, not credentials**. This repository keeps the tenant and subscription IDs in secrets to reduce accidental disclosure of environment metadata; OIDC security does not depend on hiding them.
+
+1. Open **Actions → Azure OIDC Connectivity Check → Run workflow**.
+2. Select **main**, matching the branch trusted by Azure, and run the workflow.
+3. Inspect the **Azure Login via OIDC** and **Verify Azure connectivity** steps.
+
+A successful run shows the selected Azure account and `Azure OIDC authentication successful`. The existing `az account show` command verifies authenticated account context; it does not itself query an Azure resource API. This workflow creates, deploys, and deletes no Azure resources.
+
+The demo is implemented in [`.github/workflows/azure-oidc-check.yml`](.github/workflows/azure-oidc-check.yml). For failures, see [troubleshooting](docs/azure-oidc-setup.md#troubleshooting).
+
+## License
+
+[MIT](LICENSE).
+
+## Optional guidance
+
+The following bootstrap and coding-agent guidance is **not required for the OIDC demo**.
+
+### Post-Creation Checklist
+
+The retained [`repo-setup` Agent Skill](.github/skills/repo-setup/SKILL.md) can help with optional follow-up setup:
+
+- [x] **Choose and add a LICENSE file** - This repository uses [MIT](LICENSE)
+- [ ] **Configure Azure OIDC** - Set up federated credentials and configure the following repository variable and secrets:
   - `AZURE_CLIENT_ID` (repository variable)
   - `AZURE_TENANT_ID` (repository secret)
   - `AZURE_SUBSCRIPTION_ID` (repository secret)
-  
+
   See [docs/azure-oidc-setup.md](docs/azure-oidc-setup.md) for detailed setup instructions. Then run the "Azure OIDC Connectivity Check" workflow manually to verify the configuration.
 - [ ] **Enable AI agent Azure access** (if using Azure with Copilot coding agent) - Run `azd coding-agent config` to give AI agents read-time visibility into Azure state while authoring changes. See [docs/azure-coding-agent-guide.md](docs/azure-coding-agent-guide.md) for guidance.
 - [ ] **Discover and install Agent Skills** (optional) - Find reusable [Agent Skills](https://agentskills.io) relevant to your stack and install them with [`gh skill install`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+). See the [`repo-setup` skill](.github/skills/repo-setup/SKILL.md#discover-and-install-agent-skills) for where to look and how to vet them.
-- [ ] **Update README.md** - Replace this generic template README with repository-specific documentation
-- [ ] **Review AGENTS.md** - Update or remove this file to reflect your repository's specific purpose and conventions
-
-## Included Workflows
-
-### Azure OIDC Connectivity Check
-
-A manual workflow that validates your Azure OIDC configuration is working correctly. Run it after completing the OIDC setup above.
-
-- **Trigger**: Manual (`workflow_dispatch`)
-- **File**: `.github/workflows/azure-oidc-check.yml`
-
-### E2E Test
-
-Automates provisioning of infrastructure, application deployment, test execution, and cleanup using the Azure Developer CLI (`azd`). Creates a resource group (with optional tagging from repository secrets) before running `azd provision` and `azd deploy`.
-
-- **Trigger**: Manual (`workflow_dispatch`)
-- **File**: `.github/workflows/e2e-test.yml`
-
-> ⚠️ **Security note**: Keep this on `workflow_dispatch`. Adding a `pull_request_target` or `workflow_run` trigger that checks out fork code runs untrusted code with this workflow's Azure access (a "pwn request"). See [Security considerations](docs/azure-oidc-setup.md#security-considerations) before changing the triggers.
-- **Inputs** (manual trigger):
-  - `cleanup` — Run `azd down` after tests (default: `true`)
-  - `environment` — azd environment name (default: auto-generated from run ID)
-  - `location` — Azure region (default: `japaneast`)
-
-**Customize for your project**: Edit the "Run tests" step in the workflow to add your E2E test commands (e.g., `pytest tests/e2e/`, `npm test`, or a custom test script).
-
-#### Required Configuration
-
-| Name | Type | Description |
-|------|------|-------------|
-| `AZURE_CLIENT_ID` | Variable | Application (client) ID |
-| `AZURE_TENANT_ID` | Secret | Microsoft Entra tenant ID |
-| `AZURE_SUBSCRIPTION_ID` | Secret | Azure Subscription ID |
-| `RG_TAG_NAME` | Secret | (Optional) Tag name for the resource group |
-| `RG_TAG_VALUE` | Secret | (Optional) Tag value for the resource group |
-
-### AZD Manage (Up / Down)
-
-Enables on-demand creation (`azd up`) and destruction (`azd down`) of Azure environments using the Azure Developer CLI. Creates a resource group (with optional tagging from repository secrets) before running `azd up`. Useful for managing isolated development, test, or preview environments.
-
-- **Trigger**: Manual (`workflow_dispatch`)
-- **File**: `.github/workflows/azd-manage.yml`
-- **Inputs**:
-  - `action` — `up` or `down` (required)
-  - `environment` — azd environment name (default: repository name, e.g. `my-project` → resource group `rg-my-project`)
-  - `location` — Azure region (default: `japaneast`)
-
-#### Usage
-
-1. Go to **Actions** → **AZD Manage (Up / Down)**
-2. Click **Run workflow**
-3. Select `up` to provision or `down` to tear down
-4. Optionally set a custom environment name and Azure region
+- [x] **Update README.md** - Document this repository's OIDC demo
+- [x] **Review AGENTS.md** - Describe this repository's purpose and conventions
