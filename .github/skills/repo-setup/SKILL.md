@@ -27,9 +27,8 @@ Do this first — declaring what the repo is drives the license, Azure, and skil
 Independent steps — apply those that fit, in any order.
 
 - **Equip agents with relevant skills.** Not a one-time step — most valuable now that the stack is declared, and worth repeating over time as new skills appear. See [Discover and install Agent Skills](#discover-and-install-agent-skills) below.
-- **Decide whether the repo uses Azure.** If it does not, raise removing the Azure OIDC workflow under `.github/workflows/` and the `docs/azure-*.md` guides — so the repository stays lean and technology-neutral; confirm with the user before deleting anything. If it does, continue with the next two items.
+- **Decide whether the repo uses Azure.** If it does not, raise removing the Azure OIDC workflow under `.github/workflows/` and the `docs/azure-*.md` guides — so the repository stays lean and technology-neutral; confirm with the user before deleting anything. If it does, continue with the next item.
 - **Configure Azure OIDC** (Azure only). Set up federated credentials and the `AZURE_CLIENT_ID` variable plus `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` secrets, following [docs/azure-oidc-setup.md](../../../docs/azure-oidc-setup.md). Then have the user run the **Azure OIDC Connectivity Check** workflow to verify.
-- **Enable AI agent Azure access** (Azure only). Run `azd coding-agent config` to give agents read-time visibility into Azure state. See [docs/azure-coding-agent-guide.md](../../../docs/azure-coding-agent-guide.md).
 
 ## Wind down the template scaffolding
 

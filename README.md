@@ -38,7 +38,7 @@ The demo is implemented in [`.github/workflows/azure-oidc-check.yml`](.github/wo
 
 ## Optional guidance
 
-The following bootstrap and coding-agent guidance is **not required for the OIDC demo**.
+The following bootstrap guidance is **not required for the OIDC demo**.
 
 ### Post-Creation Checklist
 
@@ -51,7 +51,6 @@ The retained [`repo-setup` Agent Skill](.github/skills/repo-setup/SKILL.md) can 
   - `AZURE_SUBSCRIPTION_ID` (repository secret)
 
   See [docs/azure-oidc-setup.md](docs/azure-oidc-setup.md) for detailed setup instructions. Then run the "Azure OIDC Connectivity Check" workflow manually to verify the configuration.
-- [ ] **Enable AI agent Azure access** (if using Azure with Copilot coding agent) - Run `azd coding-agent config` to give AI agents read-time visibility into Azure state while authoring changes. See [docs/azure-coding-agent-guide.md](docs/azure-coding-agent-guide.md) for guidance.
 - [ ] **Discover and install Agent Skills** (optional) - Find reusable [Agent Skills](https://agentskills.io) relevant to your stack and install them with [`gh skill install`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+). See the [`repo-setup` skill](.github/skills/repo-setup/SKILL.md#discover-and-install-agent-skills) for where to look and how to vet them.
 - [x] **Update README.md** - Document this repository's OIDC demo
 - [x] **Review AGENTS.md** - Describe this repository's purpose and conventions
