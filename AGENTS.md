@@ -5,7 +5,7 @@
 
 ## Repository Purpose
 
-This repository demonstrates GitHub Actions authenticating to Azure through OIDC without long-lived credentials. The demo is the manual Azure OIDC Connectivity Check.
+This repository demonstrates GitHub Actions authenticating to external services through OIDC without long-lived credentials. The Azure demo is the manual Azure OIDC Connectivity Check.
 
 ## Working Style
 

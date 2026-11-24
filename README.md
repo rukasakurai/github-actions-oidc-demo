@@ -1,18 +1,18 @@
 # GitHub Actions OIDC Demo
 
-A minimal demonstration of GitHub Actions authenticating to Azure without storing long-lived credentials.
+A minimal demonstration of GitHub Actions authenticating to external services without storing long-lived credentials.
 
-Alternatively, a workflow can authenticate using a long-lived credential, such as an Azure client secret, stored in GitHub Secrets. This demo uses OIDC instead to obtain short-lived access tokens.
+Alternatively, a workflow can authenticate using a long-lived credential stored in GitHub Secrets. This demo uses OIDC instead to obtain short-lived access tokens.
 
 ## How it works
 
 1. GitHub Actions issues a short-lived OpenID Connect (OIDC) token to the job. The workflow needs `id-token: write` to request it.
-2. `azure/login@v2` presents that token to Microsoft Entra ID, which checks the configured federated trust for the repository and branch.
-3. Azure issues a short-lived access token for the identity. The workflow then uses the authenticated Azure CLI account.
+2. The service validates the token against its configured trust for the repository and workflow context.
+3. The service returns short-lived credentials that the workflow uses to authenticate.
 
-No client secret, password, or long-lived access token is stored. Azure permissions are assigned separately through RBAC; `id-token: write` does not itself grant Azure access.
+No client secret, password, or long-lived access token is stored. Service permissions are configured separately; `id-token: write` does not itself grant access to the service.
 
-## Run the demo
+## Azure demo
 
 Follow [the Azure OIDC setup guide](docs/azure-oidc-setup.md) to create an identity, configure federated trust for your repository's `main` branch, and grant Reader access at the narrowest appropriate scope.
 

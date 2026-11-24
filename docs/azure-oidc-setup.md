@@ -375,5 +375,5 @@ OIDC removes long-lived secrets, but the app registration it authenticates is st
 - **GitHub Documentation**: [Security hardening for GitHub Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions)
 - **GitHub Documentation**: [About Actions policies](https://docs.github.com/en/enterprise-cloud@latest/admin/enforcing-policies/enforcing-policies-for-your-enterprise/actions-policies/about-actions-policies)
 - **azure/login Action**: [GitHub Marketplace](https://github.com/marketplace/actions/azure-login)
-- **README**: See [Run the demo](../README.md#run-the-demo) for the main walkthrough
+- **README**: See [Azure demo](../README.md#azure-demo) for the walkthrough
 
