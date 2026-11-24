@@ -27,7 +27,8 @@ Before you begin, ensure you have:
 
 - **Azure Subscription**: An active Azure subscription where you have appropriate permissions
 - **Azure CLI**: Installed locally for running commands ([Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)). Verify with `az version`.
-- **Azure Permissions**: Ability to create app registrations (Microsoft Entra ID) and assign roles (typically requires Contributor or Owner role)
+- **Microsoft Entra Permissions**: Ability to create an app registration and service principal under your tenant's policies
+- **Azure RBAC Permissions**: `Microsoft.Authorization/roleAssignments/write` at the target scope, for example through Role Based Access Control Administrator, User Access Administrator, or Owner. Contributor alone cannot assign roles. See [Azure role assignment prerequisites](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-cli#prerequisites).
 - **GitHub Repository**: Admin access to the GitHub repository where you want to configure OIDC
 - **GitHub Repository Settings**: Ensure your repository has Actions enabled
 
@@ -295,7 +296,7 @@ This repository includes a workflow to validate your Azure OIDC configuration.
 
 2. **Select "Azure OIDC Connectivity Check"** from the workflows list
 
-3. **Click "Run workflow"** → **Run workflow** (on your desired branch)
+3. **Click "Run workflow"**, select **main** (the branch trusted in Step 2), then **Run workflow**. If you configured a different branch, select that matching branch instead.
 
 4. **Monitor the workflow run**:
    - ✅ If successful, your Azure OIDC is configured correctly
@@ -304,7 +305,7 @@ This repository includes a workflow to validate your Azure OIDC configuration.
 The workflow performs the following checks:
 - Verifies required GitHub Actions variables/secrets are configured
 - Attempts to authenticate with Azure using OIDC
-- Runs `az account show` to confirm connectivity
+- Runs `az account show` to verify authenticated account context; this command does not itself query an Azure resource API
 
 ## Security considerations
 
@@ -374,22 +375,5 @@ OIDC removes long-lived secrets, but the app registration it authenticates is st
 - **GitHub Documentation**: [Security hardening for GitHub Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions)
 - **GitHub Documentation**: [About Actions policies](https://docs.github.com/en/enterprise-cloud@latest/admin/enforcing-policies/enforcing-policies-for-your-enterprise/actions-policies/about-actions-policies)
 - **azure/login Action**: [GitHub Marketplace](https://github.com/marketplace/actions/azure-login)
-- **README**: See the [Post-Creation Checklist](../README.md#post-creation-checklist) for context on when to configure Azure OIDC
-
-## Documentation Test History
-### 2025-12-20
-- Result: PARTIAL
-- Platform/Context: GitHub Codespaces (Dev Container)
-- OS: Ubuntu 24.04.3 LTS
-- Shell: bash (version not captured)
-- Tester: Automated Documentation Tester (with human intervention)
-- Notes: `az login` blocked by org access policy/Conditional Access; requires manual sign-in (for example `az login --use-device-code`) before remaining steps can be executed.
-
-### 2025-12-20
-- Result: PASS with fixes
-- Platform/Context: Local machine
-- OS: Microsoft Windows (Version 10.0.26200.7392)
-- Shell: PowerShell 7.5.4 (Core)
-- Tester: Automated Documentation Tester (with human intervention)
-- Notes: Completed Entra app + service principal creation, federated credential creation (required using application object id in `az ad app federated-credential`), Reader RBAC assignment, and successfully ran the "Azure OIDC Connectivity Check" workflow. Human steps: authenticated `az login`, configured GitHub Actions variable/secret values in the repo settings UI, and clicked "Run workflow".
+- **README**: See [Azure demo](../README.md#azure-demo) for the walkthrough
 
