@@ -35,22 +35,3 @@ The demo is implemented in [`.github/workflows/azure-oidc-check.yml`](.github/wo
 ## License
 
 [MIT](LICENSE).
-
-## Optional guidance
-
-The following bootstrap guidance is **not required for the OIDC demo**.
-
-### Post-Creation Checklist
-
-The retained [`repo-setup` Agent Skill](.github/skills/repo-setup/SKILL.md) can help with optional follow-up setup:
-
-- [x] **Choose and add a LICENSE file** - This repository uses [MIT](LICENSE)
-- [ ] **Configure Azure OIDC** - Set up federated credentials and configure the following repository variable and secrets:
-  - `AZURE_CLIENT_ID` (repository variable)
-  - `AZURE_TENANT_ID` (repository secret)
-  - `AZURE_SUBSCRIPTION_ID` (repository secret)
-
-  See [docs/azure-oidc-setup.md](docs/azure-oidc-setup.md) for detailed setup instructions. Then run the "Azure OIDC Connectivity Check" workflow manually to verify the configuration.
-- [ ] **Discover and install Agent Skills** (optional) - Find reusable [Agent Skills](https://agentskills.io) relevant to your stack and install them with [`gh skill install`](https://cli.github.com/manual/gh_skill_install) (GitHub CLI v2.90.0+). See the [`repo-setup` skill](.github/skills/repo-setup/SKILL.md#discover-and-install-agent-skills) for where to look and how to vet them.
-- [x] **Update README.md** - Document this repository's OIDC demo
-- [x] **Review AGENTS.md** - Describe this repository's purpose and conventions
